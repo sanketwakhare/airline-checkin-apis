@@ -1,12 +1,16 @@
 package com.sanket.airlinecheckin.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class Seat extends BaseModel{
     @ManyToOne
     private Flight flight;
