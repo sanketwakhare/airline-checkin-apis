@@ -1,12 +1,9 @@
 package com.sanket.airlinecheckin;
 
-import com.github.javafaker.Aviation;
 import com.github.javafaker.DateAndTime;
 import com.github.javafaker.Faker;
-import com.sanket.airlinecheckin.services.AirlineService;
-import com.sanket.airlinecheckin.services.FlightService;
-import com.sanket.airlinecheckin.services.TripService;
-import com.sanket.airlinecheckin.services.UserService;
+import com.sanket.airlinecheckin.models.SeatType;
+import com.sanket.airlinecheckin.services.*;
 import com.sanket.airlinecheckin.utils.RandomUserDataGenerator;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -35,16 +32,14 @@ class AirlineCheckinApisApplicationTests {
     @Autowired
     private TripService tripService;
 
-    @Test
-    void contextLoads() {
-        System.out.println("tests started");
-    }
+    @Autowired
+    private SeatService seatService;
 
     @Test
     @Order(1)
     void createUsers() {
         Faker faker = new Faker(new Locale("en-IND"));
-        for (int i=0; i<10; i++) {
+        for (int i=0; i<50; i++) {
             String name = faker.name().fullName();
             String email = RandomUserDataGenerator.generateEmail(name);
             String phone = faker.phoneNumber().phoneNumber();
@@ -83,16 +78,31 @@ class AirlineCheckinApisApplicationTests {
     @Order(4)
     void createTrips() {
         Faker faker = new Faker(new Locale("en-IND"));
-        Aviation aviation = faker.aviation();
         DateAndTime dateAndTime = faker.date();
-        for(long i=0; i< 20; i++) {
-            String source = aviation.airport();
-            String destination = aviation.airport();
+        for (long i = 0; i < 20; i++) {
+            String source = faker.address().city();
+            String destination = faker.address().city();
             while (destination.equals(source)) {
-                destination = aviation.airport();
+                destination = faker.address().city();
             }
             Date date = dateAndTime.future(30, TimeUnit.DAYS);
             tripService.createTrip((i % 10) + 1, source, destination, date.toInstant().toEpochMilli());
+        }
+    }
+
+    @Test
+    @Order(5)
+    void createSeats() {
+        for(long flightNumber = 1; flightNumber<= 6; flightNumber++) {
+            SeatType seatType = SeatType.ECONOMY_CLASS;
+            for (int seatNumber = 1; seatNumber <= 20; seatNumber++) {
+                if (seatNumber < 5) {
+                    seatType = SeatType.BUSINESS_CLASS;
+                } else if (seatNumber > 5 && seatNumber < 15) {
+                    seatType = SeatType.FIRST_CLASS;
+                }
+                seatService.createSeat(seatType, String.valueOf(seatNumber), flightNumber);
+            }
         }
     }
 
