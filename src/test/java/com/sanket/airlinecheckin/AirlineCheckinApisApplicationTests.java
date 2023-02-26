@@ -2,6 +2,7 @@ package com.sanket.airlinecheckin;
 
 import com.github.javafaker.DateAndTime;
 import com.github.javafaker.Faker;
+import com.sanket.airlinecheckin.models.BookingStatus;
 import com.sanket.airlinecheckin.models.SeatType;
 import com.sanket.airlinecheckin.services.*;
 import com.sanket.airlinecheckin.utils.RandomUserDataGenerator;
@@ -35,6 +36,9 @@ class AirlineCheckinApisApplicationTests {
     @Autowired
     private SeatService seatService;
 
+    @Autowired
+    private BookingService bookingService;
+
     @Test
     @Order(1)
     void createUsers() {
@@ -63,11 +67,7 @@ class AirlineCheckinApisApplicationTests {
     void createFlights() {
         Faker faker = new Faker(new Locale("en-IND"));
         flightService.createFlight(faker.aviation().aircraft(), "Air India");
-        flightService.createFlight(faker.aviation().aircraft(), "Air India");
         flightService.createFlight(faker.aviation().aircraft(), "Indigo");
-        flightService.createFlight(faker.aviation().aircraft(), "Indigo");
-        flightService.createFlight(faker.aviation().aircraft(), "Indigo");
-        flightService.createFlight(faker.aviation().aircraft(), "Air Asia");
         flightService.createFlight(faker.aviation().aircraft(), "Air Asia");
         flightService.createFlight(faker.aviation().aircraft(), "SpiceJet");
         flightService.createFlight(faker.aviation().aircraft(), "British Airways");
@@ -79,14 +79,14 @@ class AirlineCheckinApisApplicationTests {
     void createTrips() {
         Faker faker = new Faker(new Locale("en-IND"));
         DateAndTime dateAndTime = faker.date();
-        for (long i = 0; i < 20; i++) {
+        for (long i = 1; i <= 10; i++) {
             String source = faker.address().city();
             String destination = faker.address().city();
             while (destination.equals(source)) {
                 destination = faker.address().city();
             }
             Date date = dateAndTime.future(30, TimeUnit.DAYS);
-            tripService.createTrip((i % 10) + 1, source, destination, date.toInstant().toEpochMilli());
+            tripService.createTrip((i % 7), source, destination, date.toInstant().toEpochMilli());
         }
     }
 
@@ -102,6 +102,17 @@ class AirlineCheckinApisApplicationTests {
                     seatType = SeatType.FIRST_CLASS;
                 }
                 seatService.createSeat(seatType, String.valueOf(seatNumber), flightNumber);
+            }
+        }
+    }
+
+    @Test
+    @Order(6)
+    void initializeBookings() {
+        // trips
+        for (long i = 1; i <= 10; i++) {
+            for (int seatNumber = 1; seatNumber <= 20; seatNumber++) {
+                bookingService.initBooking(i, String.valueOf(seatNumber), BookingStatus.AVAILABLE);
             }
         }
     }

@@ -13,7 +13,6 @@ import java.util.Optional;
 public class TripService {
 
     private final TripRepository tripRepository;
-
     private final FlightRepository flightRepository;
 
     @Autowired

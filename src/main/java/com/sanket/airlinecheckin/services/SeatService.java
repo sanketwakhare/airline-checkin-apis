@@ -14,7 +14,6 @@ import java.util.Optional;
 public class SeatService {
 
     private final SeatRepository seatRepository;
-
     private final FlightRepository flightRepository;
 
     @Autowired
