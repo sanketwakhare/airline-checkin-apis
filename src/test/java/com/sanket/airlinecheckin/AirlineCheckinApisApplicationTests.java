@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Date;
 import java.util.Locale;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@EnableTransactionManagement
 class AirlineCheckinApisApplicationTests {
 
     @Autowired
@@ -115,6 +117,30 @@ class AirlineCheckinApisApplicationTests {
                 bookingService.initBooking(i, String.valueOf(seatNumber), BookingStatus.AVAILABLE);
             }
         }
+    }
+
+    @Test
+    @Order(7)
+    void bookSeat() {
+
+        bookingService.bookSeat(1L, "2", 4L);
+        bookingService.bookSeat(1L, "2", 2L);
+        bookingService.bookSeat(1L, "2", 6L);
+        bookingService.bookSeat(1L, "2", 8L);
+        bookingService.bookSeat(1L, "2", 9L);
+
+        bookingService.bookSeat(2L, "10", 5L);
+        bookingService.bookSeat(2L, "10", 2L);
+
+//        not working with threads
+//        Thread t1 = new Thread(() -> {
+//            bookingService.bookSeat(1L, "2", 4L);
+//        });
+//        Thread t2 = new Thread(() -> {
+//            bookingService.bookSeat(1L, "2", 2L);
+//        });
+//        t1.start();
+//        t2.start();
     }
 
 }
