@@ -61,4 +61,6 @@ Many to Many relation
 ### Resources:
 1. https://howtodoinjava.com/kafka/getting-started-windows-10/
 2. https://howtodoinjava.com/kafka/spring-boot-with-kafka/
-3. Arpit Bhayani's system design problem
+3. Arpit Bhayani's system design problem 
+
+   https://github.com/arpitbbhayani/system-design-questions/blob/master/airline-checkin.md
