@@ -1,5 +1,6 @@
 package com.sanket.airlinecheckin.services;
 
+import com.github.javafaker.Faker;
 import com.sanket.airlinecheckin.models.*;
 import com.sanket.airlinecheckin.repositories.BookingRepository;
 import com.sanket.airlinecheckin.repositories.SeatRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,7 @@ public class BookingService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Booking initBooking(Long tripId, String seatNumber, BookingStatus bookingStatus) {
         Booking booking = new Booking();
         booking.setBookingStatus(bookingStatus);
@@ -50,40 +53,58 @@ public class BookingService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Booking bookSeat(Long tripId, String seatNumber, Long userId) {
+    public void bookSeat(Long tripId, String seatNumber, Long userId) {
 
         Optional<Trip> trip = tripRepository.findById(tripId);
         if(trip.isEmpty()) {
             // not found
-            return null;
+            return;
         }
         Flight flight = trip.get().getFlight();
         Optional<Seat> seat = seatRepository.findSeatBySeatNumberAndFlight(seatNumber, flight.getId());
         if(seat.isEmpty()) {
             // not found
-            return null;
+            return;
         }
 
         Optional<Booking> booking = bookingRepository.findByTripIdAndSeatId(tripId, seat.get().getId());
+        // native query similar to above hql query->
+        // Optional<Booking> booking = bookingRepository.findByTripIdAndSeatIdNative(tripId);
         if(booking.isEmpty()) {
             // not found
-            return null;
+            return;
         }
         Booking dbBooking = booking.get();
         if(BookingStatus.AVAILABLE.equals(dbBooking.getBookingStatus())) {
             dbBooking.setBookingStatus(BookingStatus.LOCKED);
         } else {
             // not available
-            return null;
+            return;
         }
 
         Optional<User> user = userRepository.findById(userId);
-        if(user.isEmpty()) {
+        if (user.isEmpty()) {
             // not found
-            return null;
+            return;
         }
         dbBooking.setUser(user.get());
         dbBooking.setBookingStatus(BookingStatus.BOOKED);
-        return bookingRepository.saveAndFlush(dbBooking);
+        bookingRepository.saveAndFlush(dbBooking);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void allocateSeats(Long tripId) {
+        Optional<Trip> trip = tripRepository.findById(tripId);
+        if (trip.isEmpty()) {
+            // not found
+            return;
+        }
+
+        Faker faker = new Faker(new Locale("en-IND"));
+        for (int i = 1; i <= 20; i++) {
+            long randomUserId = faker.number().numberBetween(1L, 50L);
+            String seatNumber = String.valueOf(i);
+            bookSeat(tripId, seatNumber, randomUserId);
+        }
     }
 }

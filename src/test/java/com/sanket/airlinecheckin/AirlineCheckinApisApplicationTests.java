@@ -122,25 +122,16 @@ class AirlineCheckinApisApplicationTests {
     @Test
     @Order(7)
     void bookSeat() {
-
         bookingService.bookSeat(1L, "2", 4L);
-        bookingService.bookSeat(1L, "2", 2L);
-        bookingService.bookSeat(1L, "2", 6L);
-        bookingService.bookSeat(1L, "2", 8L);
-        bookingService.bookSeat(1L, "2", 9L);
-
         bookingService.bookSeat(2L, "10", 5L);
-        bookingService.bookSeat(2L, "10", 2L);
+    }
 
-//        not working with threads
-//        Thread t1 = new Thread(() -> {
-//            bookingService.bookSeat(1L, "2", 4L);
-//        });
-//        Thread t2 = new Thread(() -> {
-//            bookingService.bookSeat(1L, "2", 2L);
-//        });
-//        t1.start();
-//        t2.start();
+    @Test
+    @Order(8)
+    void bookRandomSeats() {
+        for(long i=1; i<=9; i++) {
+            bookingService.allocateSeats(i);
+        }
     }
 
 }
