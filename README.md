@@ -38,29 +38,36 @@
 ### Entities
 1. User
 
-        user_id | username | bio | total_blogs
-2. Blog
+        id | name | email | phone
+2. Airline
 
-        blog_id | title | body | blog_status
-3. UserBlog
+        id | name
+3. Flight
 
-        user_id | blog_id
+        id | name | airline_id
+4. Trip
 
+        id | source | destination | starttime | flight_id
+5. Seat
+
+        id | seat_number | seat_type | flight_id
+6. Booking
+
+        id | booking_status | seat_id | trip_id | user_id
 ---
 
 ### Relationships
 
-User (1 -> M) Blog
-
-Blog (1 -> M) User
-
-Many to Many relation
+      User (1 -> M) Booking
+      Airline (1 -> M) Flight
+      Flight (1 -> M) Trip
+      Flight (1 -> M) Seat
+      Trip (1 -> M) Booking
+      Seat (1 -> M) Booking
 
 ---
 
 ### Resources:
-1. https://howtodoinjava.com/kafka/getting-started-windows-10/
-2. https://howtodoinjava.com/kafka/spring-boot-with-kafka/
-3. Arpit Bhayani's system design problem 
+1. Arpit Bhayani's system design problem 
 
    https://github.com/arpitbbhayani/system-design-questions/blob/master/airline-checkin.md
